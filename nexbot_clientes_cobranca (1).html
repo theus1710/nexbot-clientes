@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Nexbot - Controle de Clientes</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background: #f4f4f9; }
+    h2 { color: #5A2D82; }
+    input, select, button { 
+      margin: 5px; padding: 8px; 
+      border-radius: 6px; 
+      border: 1px solid #ccc; 
+    }
+    button { 
+      background: #5A2D82; 
+      color: white; 
+      border: none; 
+      cursor: pointer; 
+    }
+    button:hover { background: #3e1f59; }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 20px; 
+      background: white; 
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background: #5A2D82; color: white; }
+  </style>
+</head>
+<body>
+  <h2>Nexbot - Controle de Clientes</h2>
+  
+  <input type="text" id="empresa" placeholder="Empresa">
+  <input type="text" id="nome" placeholder="Responsável">
+  <input type="text" id="telefone" placeholder="Telefone">
+  <input type="email" id="email" placeholder="E-mail">
+  
+  <select id="plano">
+    <option value="Básico">Básico</option>
+    <option value="Pro">Pro</option>
+    <option value="Enterprise">Enterprise</option>
+  </select>
+  
+  <select id="periodo">
+    <option value="Mensal">Mensal</option>
+    <option value="Anual">Anual</option>
+  </select>
+  
+  <input type="date" id="dataCobranca" placeholder="Data de Cobrança">
+  
+  <select id="status">
+    <option value="Ativo">Ativo</option>
+    <option value="Em Teste">Em Teste</option>
+    <option value="Cancelado">Cancelado</option>
+  </select>
+  
+  <button onclick="adicionarCliente()">Adicionar</button>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Empresa</th>
+        <th>Responsável</th>
+        <th>Telefone</th>
+        <th>E-mail</th>
+        <th>Plano</th>
+        <th>Período</th>
+        <th>Data Cobrança</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+  </table>
+
+  <script>
+    let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+
+    function salvar() {
+      localStorage.setItem("clientes", JSON.stringify(clientes));
+    }
+
+    function render() {
+      let tabela = document.getElementById("tabela");
+      tabela.innerHTML = "";
+      clientes.forEach((c, i) => {
+        tabela.innerHTML += `
+          <tr>
+            <td>${c.empresa}</td>
+            <td>${c.nome}</td>
+            <td>${c.telefone}</td>
+            <td>${c.email}</td>
+            <td>${c.plano}</td>
+            <td>${c.periodo}</td>
+            <td>${c.dataCobranca}</td>
+            <td>${c.status}</td>
+            <td>
+              <button onclick="removerCliente(${i})">Excluir</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function adicionarCliente() {
+      let empresa = document.getElementById("empresa").value;
+      let nome = document.getElementById("nome").value;
+      let telefone = document.getElementById("telefone").value;
+      let email = document.getElementById("email").value;
+      let plano = document.getElementById("plano").value;
+      let periodo = document.getElementById("periodo").value;
+      let dataCobranca = document.getElementById("dataCobranca").value;
+      let status = document.getElementById("status").value;
+      
+      if(empresa && nome && telefone && email && dataCobranca) {
+        clientes.push({empresa, nome, telefone, email, plano, periodo, dataCobranca, status});
+        salvar();
+        render();
+        document.getElementById("empresa").value = "";
+        document.getElementById("nome").value = "";
+        document.getElementById("telefone").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("dataCobranca").value = "";
+      } else {
+        alert("Preencha todos os campos obrigatórios!");
+      }
+    }
+
+    function removerCliente(i) {
+      if(confirm("Tem certeza que deseja excluir este cliente?")) {
+        clientes.splice(i, 1);
+        salvar();
+        render();
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
